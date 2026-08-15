@@ -343,6 +343,7 @@ const zh = {
     showOriginal: '显示原文',
     translatedFrom: '已由 {lang} 翻译',
     langUnknown: '未知语言',
-    alreadyInTargetLang: '该邮件已是目标语言'
+    alreadyInTargetLang: '该邮件已是目标语言',
+    switchAccount: '切换邮箱'
 }
 export default zh

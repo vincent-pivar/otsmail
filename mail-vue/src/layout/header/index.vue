@@ -40,6 +40,24 @@
             <div class="detail-user-type">
               <el-tag>{{ userStore.user.role.name }}</el-tag>
             </div>
+
+            <div class="account-switcher" v-if="switchAccounts.length > 1">
+              <div class="switcher-title">{{ $t('switchAccount') }}</div>
+              <el-scrollbar max-height="180px">
+                <div
+                    v-for="acc in switchAccounts"
+                    :key="acc.accountId"
+                    class="switcher-item"
+                    :class="{ 'switcher-current': acc.accountId === accountStore.currentAccountId }"
+                    @click="switchTo(acc)">
+                  <div class="switcher-avatar">{{ formatName(acc.email) }}</div>
+                  <div class="switcher-email">{{ acc.email }}</div>
+                  <Icon v-if="acc.accountId === accountStore.currentAccountId"
+                        class="switcher-check" icon="mingcute:check-fill" width="16" height="16"/>
+                </div>
+              </el-scrollbar>
+            </div>
+
             <div class="action-info">
               <div>
                 <span style="margin-right: 10px">{{ $t('sendCount') }}</span>
@@ -79,8 +97,10 @@ import {logout} from "@/request/login.js";
 import {Icon} from "@iconify/vue";
 import {useUiStore} from "@/store/ui.js";
 import {useUserStore} from "@/store/user.js";
+import {useAccountStore} from "@/store/account.js";
+import {accountList} from "@/request/account.js";
 import {useRoute} from "vue-router";
-import {computed, ref} from "vue";
+import {computed, ref, onMounted, watch} from "vue";
 import {useSettingStore} from "@/store/setting.js";
 import {hasPerm} from "@/perm/perm.js"
 import {useI18n} from "vue-i18n";
@@ -90,10 +110,45 @@ const {t} = useI18n();
 const route = useRoute();
 const settingStore = useSettingStore();
 const userStore = useUserStore();
+const accountStore = useAccountStore();
 const uiStore = useUiStore();
 const logoutLoading = ref(false)
 const userInfoShow = ref(false)
 const userinfoRef = ref({})
+
+// ---- 顶部多账号快速切换 --------------------------------------------------
+// 拉当前用户名下的邮箱列表（含主邮箱），下拉里点一下即切换。
+// 切换只改 accountStore.currentAccountId，收件箱/发件箱等页面已 watch 该值自动刷新。
+const switchAccounts = ref([])
+
+async function loadSwitchAccounts() {
+  try {
+    // size 给大一点，一次性拉全（个人自建邮箱账号数通常个位到几十）
+    const list = await accountList(0, 100, null)
+    switchAccounts.value = Array.isArray(list) ? list : (list?.list || [])
+  } catch (e) {
+    switchAccounts.value = []
+  }
+}
+
+function switchTo(acc) {
+  if (acc.accountId === accountStore.currentAccountId) {
+    userInfoHide()
+    return
+  }
+  accountStore.currentAccountId = acc.accountId
+  accountStore.currentAccount = acc
+  userInfoHide()
+}
+
+onMounted(() => {
+  loadSwitchAccounts()
+})
+
+// 新增邮箱后刷新列表
+watch(() => userStore.refreshList, () => {
+  loadSwitchAccounts()
+})
 
 const accountCount = computed(() => {
   return userStore.user.role.accountCount
@@ -287,6 +342,67 @@ function formatName(email) {
 
   .detail-user-type {
     margin-top: 10px;
+  }
+
+  .account-switcher {
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px 12px 4px;
+    border-top: 1px solid var(--dark-border);
+
+    .switcher-title {
+      font-size: 12px;
+      color: var(--regular-text-color);
+      margin-bottom: 6px;
+      text-align: left;
+    }
+
+    .switcher-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+
+      &:hover {
+        background: var(--base-fill);
+      }
+
+      &.switcher-current {
+        background: var(--base-fill);
+      }
+
+      .switcher-avatar {
+        flex: 0 0 auto;
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: var(--el-bg-color);
+        color: var(--el-text-color-primary);
+        border: 1px solid var(--dark-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+      }
+
+      .switcher-email {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        color: var(--el-text-color-primary);
+      }
+
+      .switcher-check {
+        flex: 0 0 auto;
+        color: var(--login-switch-color, #1890ff);
+      }
+    }
   }
 
   .action-info {

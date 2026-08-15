@@ -343,7 +343,8 @@ const en = {
     showOriginal: 'Show original',
     translatedFrom: 'Translated from {lang}',
     langUnknown: 'unknown',
-    alreadyInTargetLang: 'This email is already in the target language'
+    alreadyInTargetLang: 'This email is already in the target language',
+    switchAccount: 'Switch mailbox'
 }
 
 export default en
