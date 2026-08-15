@@ -30,8 +30,32 @@ const dbInit = {
 		await this.v2_9DB(c);
 		await this.v3_0DB(c);
 		await this.v3_1DB(c);
+		await this.otsmail_1DB(c);
 		await settingService.refresh(c);
 		return c.text('success');
+	},
+
+	// otsmail 迁移：邮件翻译缓存表
+	async otsmail_1DB(c) {
+		try {
+			await c.env.db.batch([
+				c.env.db.prepare(`CREATE TABLE IF NOT EXISTS email_translation (
+					email_id INTEGER NOT NULL,
+					target_lang TEXT NOT NULL,
+					user_id INTEGER NOT NULL,
+					translated_subject TEXT NOT NULL,
+					translated_content TEXT NOT NULL,
+					source_lang TEXT,
+					model TEXT NOT NULL,
+					create_time DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+					PRIMARY KEY (email_id, target_lang)
+				)`),
+				c.env.db.prepare(`CREATE INDEX IF NOT EXISTS idx_translation_user ON email_translation (user_id)`),
+				c.env.db.prepare(`CREATE INDEX IF NOT EXISTS idx_translation_email ON email_translation (email_id)`)
+			]);
+		} catch (e) {
+			console.warn(`跳过字段：${e.message}`);
+		}
 	},
 
 	async v3_1DB(c) {
