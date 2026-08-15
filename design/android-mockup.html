@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>otsmail Android 客户端 · 界面方案</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ots-bg);color:var(--ots-text);
+ font-family:-apple-system,Inter,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+ padding:var(--ots-sp-5) var(--ots-sp-4) var(--ots-sp-6)}
+.pagehead{max-width:1560px;margin:0 auto var(--ots-sp-5)}
+.pagehead h1{font-size:26px;font-weight:var(--ots-fw-strong);letter-spacing:-.4px}
+.pagehead p{color:var(--ots-text-sub);font-size:var(--ots-fs-body);margin-top:var(--ots-sp-2)}
+.rail{display:flex;gap:var(--ots-sp-5);overflow-x:auto;padding:var(--ots-sp-2) 0 var(--ots-sp-4);
+ max-width:1560px;margin:0 auto}
+.slot{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:var(--ots-sp-3)}
+.cap{font-size:var(--ots-fs-meta);color:var(--ots-text-sub);text-align:center}
+.cap b{display:block;font-size:var(--ots-fs-body);color:var(--ots-text);
+ font-weight:var(--ots-fw-strong);margin-bottom:2px}
+
+/* ---- phone frame ---- */
+.phone{width:360px;height:780px;background:var(--ots-surface);border:1px solid var(--ots-divider);
+ border-radius:var(--ots-r-lg);overflow:hidden;position:relative;display:flex;flex-direction:column;
+ box-shadow:var(--ots-shadow-2)}
+.sb{height:var(--ots-statusbar-h);flex:0 0 auto;display:flex;align-items:center;
+ justify-content:space-between;padding:0 var(--ots-sp-3);font-size:11px;
+ color:var(--ots-text);background:var(--ots-surface)}
+.sb .ico{display:flex;gap:5px;align-items:center}
+.appbar{height:var(--ots-appbar-h);flex:0 0 auto;display:flex;align-items:center;
+ gap:var(--ots-sp-2);padding:0 var(--ots-sp-2);background:var(--ots-surface);
+ border-bottom:1px solid var(--ots-divider)}
+.appbar h2{font-size:var(--ots-fs-title);font-weight:var(--ots-fw-strong);flex:1;
+ letter-spacing:-.2px;padding-left:var(--ots-sp-1)}
+.body{flex:1 1 auto;overflow:hidden;background:var(--ots-surface);position:relative}
+.navbar{height:var(--ots-navbar-h);flex:0 0 auto;display:flex;
+ border-top:1px solid var(--ots-divider);background:var(--ots-surface)}
+.navbar button{flex:1;background:none;border:0;display:flex;flex-direction:column;
+ align-items:center;justify-content:center;gap:3px;font-size:10px;
+ color:var(--ots-text-faint);cursor:pointer;min-height:48px}
+.navbar button.on{color:var(--ots-accent)}
+
+/* ---- generic bits ---- */
+.ib{width:48px;height:48px;border:0;background:none;display:flex;align-items:center;
+ justify-content:center;color:var(--ots-text-sub);cursor:pointer;border-radius:var(--ots-r-full)}
+svg{display:block;flex:0 0 auto}
+.av{width:40px;height:40px;border-radius:var(--ots-r-full);flex:0 0 auto;display:flex;
+ align-items:center;justify-content:center;color:var(--ots-text-on-accent);
+ font-size:15px;font-weight:var(--ots-fw-strong)}
+.a1{background:var(--ots-av-1)}.a2{background:var(--ots-av-2)}.a3{background:var(--ots-av-3)}
+.a4{background:var(--ots-av-4)}.a5{background:var(--ots-av-5)}
+
+/* ---- chips ---- */
+.chips{display:flex;gap:var(--ots-sp-2);padding:var(--ots-sp-3) var(--ots-sp-4);
+ border-bottom:1px solid var(--ots-divider)}
+.chip{border:1px solid var(--ots-divider);background:var(--ots-surface);
+ color:var(--ots-text-sub);font-size:var(--ots-fs-meta);padding:6px 12px;
+ border-radius:var(--ots-r-full);cursor:pointer}
+.chip.on{background:var(--ots-accent-weak);color:var(--ots-accent);border-color:var(--ots-accent-weak);
+ font-weight:var(--ots-fw-strong)}
+
+/* ---- mail list ---- */
+.list{list-style:none;overflow:hidden;padding-bottom:72px}
+.row{display:flex;gap:var(--ots-sp-3);padding:var(--ots-sp-3) var(--ots-sp-4);
+ border-bottom:1px solid var(--ots-divider);align-items:flex-start;min-height:48px}
+.row:last-child{border-bottom:0}
+.row .mid{flex:1;min-width:0}
+.subj{font-size:var(--ots-fs-subject);color:var(--ots-text-sub);
+ font-weight:var(--ots-fw-normal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.new .subj{color:var(--ots-text);font-weight:700}
+.prev{font-size:var(--ots-fs-preview);color:var(--ots-text-faint);margin-top:3px;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto}
+.time{font-size:var(--ots-fs-meta);color:var(--ots-text-faint)}
+.row.new .time{color:var(--ots-accent);font-weight:var(--ots-fw-strong)}
+.dot{width:8px;height:8px;border-radius:var(--ots-r-full);background:var(--ots-unread)}
+.tags{display:flex;gap:4px;align-items:center}
+.star{color:var(--ots-star)}.clip{color:var(--ots-text-faint)}
+
+/* ---- fab ---- */
+.fab{position:absolute;right:var(--ots-sp-4);bottom:var(--ots-sp-5);
+ width:var(--ots-fab);height:var(--ots-fab);border-radius:var(--ots-r-lg);border:0;
+ background:var(--ots-accent);color:var(--ots-text-on-accent);display:flex;
+ align-items:center;justify-content:center;box-shadow:var(--ots-shadow-2);cursor:pointer}
+</style>
+</head>
+<body>
+<div class="pagehead">
+  <h1>otsmail · Android 客户端界面方案</h1>
+  <p>基于 otsmail 现有 HTTP API 的原生客户端（不走 IMAP）。四屏覆盖核心路径：收件箱 → 邮件详情 → 写邮件 → 账号设置。以下为 1:1 尺寸（360×780）静态稿，配色取自 design/tokens.css。</p>
+</div>
+<div class="rail">
+<!-- ===== SCREEN 1 : 收件箱 ===== -->
+<div class="slot">
+<div class="phone">
+  <div class="sb"><span>9:41</span><span class="ico">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="2.4" height="3" rx=".6"/><rect x="3.7" y="5" width="2.4" height="5" rx=".6"/><rect x="7.4" y="2.6" width="2.4" height="7.4" rx=".6"/><rect x="11.1" y="0" width="2.4" height="10" rx=".6"/></svg>
+    <svg width="13" height="10" viewBox="0 0 13 10" fill="currentColor" aria-hidden="true"><path d="M6.5 9.4 1 3.6A7.7 7.7 0 0 1 6.5 1.3c2.1 0 4 .85 5.5 2.3L6.5 9.4Z"/></svg>
+    <svg width="20" height="10" viewBox="0 0 20 10" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" fill="none" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="17.4" y="3.4" width="2" height="3.2" rx=".8" fill="currentColor"/></svg>
+  </span></div>
+
+  <div class="appbar">
+    <button class="ib" aria-label="打开侧边菜单"><svg width="20" height="14" viewBox="0 0 20 14" fill="currentColor" aria-hidden="true"><rect width="20" height="2" rx="1"/><rect y="6" width="20" height="2" rx="1"/><rect y="12" width="20" height="2" rx="1"/></svg></button>
+    <h2>收件箱</h2>
+    <button class="ib" aria-label="搜索邮件"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5"/><path d="M11.6 11.6 16 16"/></svg></button>
+  </div>
+
+  <div class="body">
+    <div class="chips">
+      <button class="chip on">全部</button>
+      <button class="chip">未读</button>
+      <button class="chip">已加星</button>
+      <button class="chip">附件</button>
+    </div>
+    <ul class="list">
+      <li class="row new"><div class="av a1">G</div><div class="mid">
+        <div class="subj">GitHub 登录验证码</div>
+        <div class="prev">你的验证码是 493 715，5 分钟内有效，请勿转发…</div>
+      </div><div class="meta"><span class="time">09:38</span><span class="dot"></span></div></li>
+
+      <li class="row new"><div class="av a2">支</div><div class="mid">
+        <div class="subj">交易成功通知</div>
+        <div class="prev">您于 08 月 15 日 09:12 完成一笔支付，金额 ¥128.00…</div>
+      </div><div class="meta"><span class="time">09:12</span><span class="dot"></span></div></li>
+
+      <li class="row"><div class="av a3">C</div><div class="mid">
+        <div class="subj">Cloudflare 账单已生成</div>
+        <div class="prev">invoice-2026-08.pdf · Workers Paid $5.00…</div>
+      </div><div class="meta"><span class="time">08:47</span>
+        <span class="tags"><svg class="star" width="13" height="13" viewBox="0 0 13 13" fill="currentColor" aria-hidden="true"><path d="m6.5 0 2 4.1 4.5.65-3.25 3.2.77 4.5L6.5 10.3 2.48 12.45l.77-4.5L0 4.75 4.5 4.1 6.5 0Z"/></svg><svg class="clip" width="11" height="13" viewBox="0 0 11 13" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8.5 5.5 4.7 9.3a2 2 0 1 1-2.9-2.9l4.6-4.6a3 3 0 0 1 4.2 4.2L5.6 10.9"/></svg></span>
+      </div></li>
+
+      <li class="row new"><div class="av a4">V</div><div class="mid">
+        <div class="subj">Vercel 部署完成</div>
+        <div class="prev">Production deployment ready · otsfolio…</div>
+      </div><div class="meta"><span class="time">昨天</span><span class="dot"></span></div></li>
+
+      <li class="row"><div class="av a5">团</div><div class="mid">
+        <div class="subj">周会记录与下周排期</div>
+        <div class="prev">附件里是本周的会议记录，请各位确认自己的部分…</div>
+      </div><div class="meta"><span class="time">昨天</span>
+        <span class="tags"><svg class="clip" width="11" height="13" viewBox="0 0 11 13" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8.5 5.5 4.7 9.3a2 2 0 1 1-2.9-2.9l4.6-4.6a3 3 0 0 1 4.2 4.2L5.6 10.9"/></svg></span>
+      </div></li>
+
+      <li class="row"><div class="av a1">N</div><div class="mid">
+        <div class="subj">Nous Research 月度简报</div>
+        <div class="prev">本月开源模型进展与社区动态汇总…</div>
+      </div><div class="meta"><span class="time">周四</span>
+        <span class="tags"><svg class="star" width="13" height="13" viewBox="0 0 13 13" fill="currentColor" aria-hidden="true"><path d="m6.5 0 2 4.1 4.5.65-3.25 3.2.77 4.5L6.5 10.3 2.48 12.45l.77-4.5L0 4.75 4.5 4.1 6.5 0Z"/></svg></span>
+      </div></li>
+
+      <li class="row"><div class="av a3">阿</div><div class="mid">
+        <div class="subj">域名续费提醒</div>
+        <div class="prev">您有 1 个域名将于 30 天后到期，请及时续费…</div>
+      </div><div class="meta"><span class="time">周三</span></div></li>
+
+      <li class="row"><div class="av a2">R</div><div class="mid">
+        <div class="subj">Resend 用量报告</div>
+        <div class="prev">本月已发送 1,204 封，剩余额度 1,796 封…</div>
+      </div><div class="meta"><span class="time">周二</span></div></li>
+
+    </ul>
+    <button class="fab" aria-label="写邮件"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M15.5 2.6 19.4 6.5 7.4 18.5l-4.5 1 1-4.5 11.6-12.4Z"/><path d="M14 4.2 17.8 8"/></svg></button>
+  </div>
+
+  <nav class="navbar">
+    <button class="on" aria-label="邮件"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="1.5" y="4" width="17" height="12.5" rx="2"/><path d="m2.5 5.5 7.5 5.5 7.5-5.5"/></svg>邮件</button>
+    <button aria-label="已发送"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 2 2 8.6l6 2.4 2.4 6L18 2Z"/><path d="M8 11 18 2"/></svg>已发送</button>
+    <button aria-label="星标"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m10 1.6 2.6 5.3 5.8.85-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L1.6 7.75l5.8-.85L10 1.6Z"/></svg>星标</button>
+    <button aria-label="我的"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10" cy="6.6" r="3.6"/><path d="M2.8 18c.9-3.7 3.8-5.6 7.2-5.6s6.3 1.9 7.2 5.6"/></svg>我的</button>
+  </nav>
+</div>
+<div class="cap"><b>① 收件箱</b>筛选 chip + 未读加粗 + 蓝点<br>右下角 FAB 写邮件</div>
+</div>
+
+<!-- ===== SCREEN 2 : 邮件详情 ===== -->
+<div class="slot">
+<div class="phone">
+  <div class="sb"><span>9:41</span><span class="ico">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="2.4" height="3" rx=".6"/><rect x="3.7" y="5" width="2.4" height="5" rx=".6"/><rect x="7.4" y="2.6" width="2.4" height="7.4" rx=".6"/><rect x="11.1" y="0" width="2.4" height="10" rx=".6"/></svg>
+    <svg width="13" height="10" viewBox="0 0 13 10" fill="currentColor" aria-hidden="true"><path d="M6.5 9.4 1 3.6A7.7 7.7 0 0 1 6.5 1.3c2.1 0 4 .85 5.5 2.3L6.5 9.4Z"/></svg>
+    <svg width="20" height="10" viewBox="0 0 20 10" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" fill="none" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="17.4" y="3.4" width="2" height="3.2" rx=".8" fill="currentColor"/></svg>
+  </span></div>
+
+  <div class="appbar">
+    <button class="ib" aria-label="返回"><svg width="19" height="16" viewBox="0 0 19 16" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M8 1 1 8l7 7"/><path d="M1 8h17"/></svg></button>
+    <span style="flex:1"></span>
+    <button class="ib" aria-label="加星"><svg class="star" width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true"><path d="m9 1 2.4 4.9 5.4.78-3.9 3.8.92 5.4L9 13.3l-4.8 2.58.92-5.4L1.2 6.68l5.4-.78L9 1Z"/></svg></button>
+    <button class="ib" aria-label="归档"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="1.2" y="2" width="15.6" height="4" rx="1"/><path d="M2.6 6v9a1 1 0 0 0 1 1h10.8a1 1 0 0 0 1-1V6"/><path d="M6.8 9.6h4.4"/></svg></button>
+    <button class="ib" aria-label="删除"><svg width="17" height="18" viewBox="0 0 17 18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M1.6 4.4h13.8"/><path d="M3.4 4.4V16a1 1 0 0 0 1 1h8.2a1 1 0 0 0 1-1V4.4"/><path d="M6.2 4.4V2.2a1 1 0 0 1 1-1h2.6a1 1 0 0 1 1 1v2.2"/></svg></button>
+    <button class="ib" aria-label="更多操作"><svg width="5" height="18" viewBox="0 0 5 18" fill="currentColor" aria-hidden="true"><circle cx="2.5" cy="3" r="2"/><circle cx="2.5" cy="9" r="2"/><circle cx="2.5" cy="15" r="2"/></svg></button>
+  </div>
+
+  <div class="body" style="display:flex;flex-direction:column">
+    <div style="padding:var(--ots-sp-4) var(--ots-sp-4) 0">
+      <div style="font-size:var(--ots-fs-title);font-weight:var(--ots-fw-strong);line-height:1.35;letter-spacing:-.2px">GitHub 登录验证码</div>
+    </div>
+
+    <div style="display:flex;gap:var(--ots-sp-3);align-items:flex-start;padding:var(--ots-sp-4)">
+      <div class="av a1">G</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:baseline;gap:var(--ots-sp-2)">
+          <span style="font-size:var(--ots-fs-body);font-weight:var(--ots-fw-strong)">GitHub</span>
+          <span class="time" style="margin-left:auto">08-15 09:38</span>
+        </div>
+        <div style="font-size:var(--ots-fs-preview);color:var(--ots-text-sub);margin-top:2px">noreply@github.com</div>
+        <div style="font-size:var(--ots-fs-meta);color:var(--ots-text-faint);margin-top:3px">收件人: me@otsmail.dev</div>
+      </div>
+    </div>
+
+    <div style="padding:0 var(--ots-sp-4);flex:1;overflow:hidden">
+      <p style="font-size:var(--ots-fs-body);line-height:1.7;color:var(--ots-text)">你好，</p>
+      <p style="font-size:var(--ots-fs-body);line-height:1.7;color:var(--ots-text);margin-top:var(--ots-sp-3)">我们检测到一次来自新设备的登录请求。请在页面中输入下面的验证码以继续：</p>
+
+      <div style="display:flex;align-items:center;gap:var(--ots-sp-3);margin:var(--ots-sp-4) 0">
+        <span style="flex:1;text-align:center;background:var(--ots-accent-weak);color:var(--ots-accent);
+          font-size:26px;font-weight:var(--ots-fw-strong);letter-spacing:3px;
+          padding:12px var(--ots-sp-3);border-radius:var(--ots-r-md)">493 715</span>
+        <button style="display:flex;align-items:center;gap:6px;min-height:48px;padding:0 var(--ots-sp-4);
+          border:0;background:var(--ots-accent);color:var(--ots-text-on-accent);
+          border-radius:var(--ots-r-sm);font-size:var(--ots-fs-body);font-weight:var(--ots-fw-strong);cursor:pointer">
+          <svg width="14" height="15" viewBox="0 0 13 14" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="1" width="8" height="9" rx="1.4"/><path d="M9 12.4V13H1.8a.8.8 0 0 1-.8-.8V4h1.6"/></svg>
+          复制
+        </button>
+      </div>
+
+      <p style="font-size:var(--ots-fs-preview);line-height:1.7;color:var(--ots-text-sub)">验证码 5 分钟内有效。如果这不是你本人的操作，请立即修改密码并开启两步验证。</p>
+
+      <div style="display:flex;align-items:center;gap:var(--ots-sp-3);margin-top:var(--ots-sp-4);
+        border:1px solid var(--ots-divider);border-radius:var(--ots-r-md);padding:var(--ots-sp-3)">
+        <svg width="26" height="30" viewBox="0 0 26 30" fill="none" stroke="var(--ots-danger)" stroke-width="1.6" aria-hidden="true"><path d="M2 2h14l8 8v18H2V2Z"/><path d="M16 2v8h8"/></svg>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:var(--ots-fs-preview);font-weight:var(--ots-fw-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">登录活动记录.pdf</div>
+          <div style="font-size:var(--ots-fs-meta);color:var(--ots-text-faint);margin-top:2px">96 KB</div>
+        </div>
+        <button class="ib" aria-label="下载附件"><svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="var(--ots-accent)" stroke-width="1.8" aria-hidden="true"><path d="M8.5 1v10"/><path d="M4.4 7.4 8.5 11.5l4.1-4.1"/><path d="M1.5 14.5h14"/></svg></button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:var(--ots-sp-3);padding:var(--ots-sp-3) var(--ots-sp-4);
+      border-top:1px solid var(--ots-divider);background:var(--ots-surface)">
+      <button style="flex:1;min-height:48px;border:0;border-radius:var(--ots-r-sm);
+        background:var(--ots-accent);color:var(--ots-text-on-accent);font-size:var(--ots-fs-body);
+        font-weight:var(--ots-fw-strong);cursor:pointer">回复</button>
+      <button style="flex:1;min-height:48px;border:1px solid var(--ots-divider);
+        border-radius:var(--ots-r-sm);background:var(--ots-surface);color:var(--ots-text-sub);
+        font-size:var(--ots-fs-body);cursor:pointer">转发</button>
+    </div>
+  </div>
+</div>
+<div class="cap"><b>② 邮件详情</b>验证码高亮胶囊 + 复制主按钮<br>进详情隐藏底栏（同 Gmail），底部只留回复/转发</div>
+</div>
+
+<!-- ===== SCREEN 3 : 写邮件 ===== -->
+<div class="slot">
+<div class="phone">
+  <div class="sb"><span>9:41</span><span class="ico">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="2.4" height="3" rx=".6"/><rect x="3.7" y="5" width="2.4" height="5" rx=".6"/><rect x="7.4" y="2.6" width="2.4" height="7.4" rx=".6"/><rect x="11.1" y="0" width="2.4" height="10" rx=".6"/></svg>
+    <svg width="13" height="10" viewBox="0 0 13 10" fill="currentColor" aria-hidden="true"><path d="M6.5 9.4 1 3.6A7.7 7.7 0 0 1 6.5 1.3c2.1 0 4 .85 5.5 2.3L6.5 9.4Z"/></svg>
+    <svg width="20" height="10" viewBox="0 0 20 10" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" fill="none" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="17.4" y="3.4" width="2" height="3.2" rx=".8" fill="currentColor"/></svg>
+  </span></div>
+
+  <div class="appbar">
+    <button class="ib" aria-label="关闭"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M1.5 1.5 14.5 14.5"/><path d="M14.5 1.5 1.5 14.5"/></svg></button>
+    <h2 style="font-size:var(--ots-fs-body)">写邮件</h2>
+    <button class="ib" aria-label="发送"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--ots-accent)" stroke-width="1.8" aria-hidden="true"><path d="M18.4 1.6 1.6 8.5l6.3 2.5 2.5 6.3 8-15.7Z"/><path d="M7.9 11 18.4 1.6"/></svg></button>
+  </div>
+
+  <div class="body" style="display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;gap:var(--ots-sp-2);padding:var(--ots-sp-3) var(--ots-sp-4);border-bottom:1px solid var(--ots-divider);min-height:48px">
+      <span style="font-size:var(--ots-fs-preview);color:var(--ots-text-faint);width:46px;flex:0 0 auto">发件人</span>
+      <span style="font-size:var(--ots-fs-body);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">me@otsmail.dev</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:var(--ots-sp-2);padding:var(--ots-sp-3) var(--ots-sp-4);border-bottom:1px solid var(--ots-divider);min-height:48px">
+      <span style="font-size:var(--ots-fs-preview);color:var(--ots-text-faint);width:46px;flex:0 0 auto">收件人</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:var(--ots-surface-alt);
+        border:1px solid var(--ots-divider);border-radius:var(--ots-r-full);
+        padding:5px 6px 5px 10px;font-size:var(--ots-fs-preview)">
+        friend@example.com
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l8 8"/><path d="M9 1 1 9"/></svg>
+      </span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:var(--ots-sp-2);padding:var(--ots-sp-3) var(--ots-sp-4);border-bottom:1px solid var(--ots-divider);min-height:48px">
+      <span style="font-size:var(--ots-fs-preview);color:var(--ots-accent);flex:1">抄送 / 密送</span>
+      <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="var(--ots-accent)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:var(--ots-sp-2);padding:var(--ots-sp-3) var(--ots-sp-4);border-bottom:1px solid var(--ots-divider);min-height:48px">
+      <span style="font-size:var(--ots-fs-preview);color:var(--ots-text-faint);width:46px;flex:0 0 auto">主题</span>
+      <span style="font-size:var(--ots-fs-body);color:var(--ots-text)">关于下周的排期</span>
+    </div>
+
+    <div style="padding:var(--ots-sp-4);flex:1;display:flex;align-items:flex-start;gap:2px">
+      <span style="font-size:var(--ots-fs-body);color:var(--ots-text-faint)">撰写邮件…</span>
+      <span style="display:inline-block;width:1px;height:19px;background:var(--ots-accent)"></span>
+    </div>
+
+    <div style="display:flex;gap:var(--ots-sp-1);padding:var(--ots-sp-1) var(--ots-sp-2);
+      border-top:1px solid var(--ots-divider);background:var(--ots-surface)">
+      <button class="ib" aria-label="添加附件"><svg width="16" height="18" viewBox="0 0 16 18" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 7.5 6.6 12.9a2.7 2.7 0 1 1-3.8-3.8l6.4-6.4a4 4 0 0 1 5.7 5.7l-7.1 7.1"/></svg></button>
+      <button class="ib" aria-label="插入图片"><svg width="18" height="16" viewBox="0 0 18 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="1" y="1.2" width="16" height="13.6" rx="2"/><circle cx="5.6" cy="5.6" r="1.6"/><path d="m2.4 13 4.6-4.6 3.4 3.4 2.4-2.4 3.2 3.2"/></svg></button>
+      <button class="ib" aria-label="加粗"><svg width="14" height="16" viewBox="0 0 14 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2.5 1.4h5.2a3.3 3.3 0 0 1 0 6.6H2.5V1.4Z"/><path d="M2.5 8h6a3.3 3.3 0 0 1 0 6.6h-6V8Z"/></svg></button>
+      <button class="ib" aria-label="项目符号列表"><svg width="18" height="14" viewBox="0 0 18 14" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 1.6h11"/><path d="M6 7h11"/><path d="M6 12.4h11"/><circle cx="1.8" cy="1.6" r="1.4" fill="currentColor" stroke="none"/><circle cx="1.8" cy="7" r="1.4" fill="currentColor" stroke="none"/><circle cx="1.8" cy="12.4" r="1.4" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+
+    <!-- 模拟软键盘：只用形状表达「键盘已弹出」，不画字母 -->
+    <div style="background:var(--ots-divider);padding:var(--ots-sp-2) 5px;flex:0 0 auto">
+      <div style="display:flex;gap:4px;margin-bottom:5px">
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:5px;padding:0 16px">
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:5px">
+        <span style="flex:1.5;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1.5;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+      </div>
+      <div style="display:flex;gap:4px">
+        <span style="flex:1.4;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:5;height:34px;background:var(--ots-surface-alt);border-radius:5px"></span>
+        <span style="flex:1.4;height:34px;background:var(--ots-accent);border-radius:5px"></span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cap"><b>③ 写邮件</b>字段行 + 收件人 chip + 抄送折叠<br>底部键盘示意（不占正式布局）</div>
+</div>
+
+<!-- ===== SCREEN 4 : 我的 / 账号 ===== -->
+<div class="slot">
+<div class="phone">
+  <div class="sb"><span>9:41</span><span class="ico">
+    <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor" aria-hidden="true"><rect x="0" y="7" width="2.4" height="3" rx=".6"/><rect x="3.7" y="5" width="2.4" height="5" rx=".6"/><rect x="7.4" y="2.6" width="2.4" height="7.4" rx=".6"/><rect x="11.1" y="0" width="2.4" height="10" rx=".6"/></svg>
+    <svg width="13" height="10" viewBox="0 0 13 10" fill="currentColor" aria-hidden="true"><path d="M6.5 9.4 1 3.6A7.7 7.7 0 0 1 6.5 1.3c2.1 0 4 .85 5.5 2.3L6.5 9.4Z"/></svg>
+    <svg width="20" height="10" viewBox="0 0 20 10" aria-hidden="true"><rect x=".5" y=".5" width="16" height="9" rx="2" fill="none" stroke="currentColor"/><rect x="2" y="2" width="11" height="6" rx="1" fill="currentColor"/><rect x="17.4" y="3.4" width="2" height="3.2" rx=".8" fill="currentColor"/></svg>
+  </span></div>
+
+  <div class="appbar"><h2>我的</h2></div>
+
+  <div class="body" style="overflow:hidden;background:var(--ots-bg)">
+    <!-- profile -->
+    <div style="background:var(--ots-surface);padding:var(--ots-sp-4);
+      border-bottom:1px solid var(--ots-divider)">
+      <div style="display:flex;gap:var(--ots-sp-3);align-items:center">
+        <div class="av a2" style="width:56px;height:56px;font-size:20px">V</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:var(--ots-fs-body);font-weight:var(--ots-fw-strong)">vincent@otsmail.dev</div>
+          <div style="font-size:var(--ots-fs-meta);color:var(--ots-text-faint);margin-top:3px">管理员 · 3 个邮箱</div>
+        </div>
+      </div>
+      <div style="margin-top:var(--ots-sp-4)">
+        <div style="height:6px;background:var(--ots-divider);border-radius:var(--ots-r-full);overflow:hidden">
+          <div style="width:12%;height:100%;background:var(--ots-accent);border-radius:var(--ots-r-full)"></div>
+        </div>
+        <div style="font-size:var(--ots-fs-meta);color:var(--ots-text-faint);margin-top:6px">附件占用 1.2 GB / 10 GB</div>
+      </div>
+    </div>
+
+    <!-- group 账号 -->
+    <div style="font-size:var(--ots-fs-meta);color:var(--ots-text-faint);
+      padding:var(--ots-sp-4) var(--ots-sp-4) var(--ots-sp-2)">账号</div>
+    <div style="background:var(--ots-surface);border-top:1px solid var(--ots-divider);
+      border-bottom:1px solid var(--ots-divider)">
+
+      <button style="width:100%;display:flex;align-items:center;gap:var(--ots-sp-3);
+        min-height:48px;padding:var(--ots-sp-3) var(--ots-sp-4);border:0;background:none;
+        border-bottom:1px solid var(--ots-divider);cursor:pointer;text-align:left">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><rect x="1.2" y="3.6" width="15.6" height="11" rx="2"/><path d="m2.2 4.8 6.8 5 6.8-5"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body);color:var(--ots-text)">多邮箱管理</span>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+
+      <button style="width:100%;display:flex;align-items:center;gap:var(--ots-sp-3);
+        min-height:48px;padding:var(--ots-sp-3) var(--ots-sp-4);border:0;background:none;
+        border-bottom:1px solid var(--ots-divider);cursor:pointer;text-align:left">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><rect x="3" y="7.6" width="12" height="9" rx="2"/><path d="M5.8 7.6V5.2a3.2 3.2 0 0 1 6.4 0v2.4"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body);color:var(--ots-text)">修改密码</span>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+
+      <button style="width:100%;display:flex;align-items:center;gap:var(--ots-sp-3);
+        min-height:48px;padding:var(--ots-sp-3) var(--ots-sp-4);border:0;background:none;
+        cursor:pointer;text-align:left">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><circle cx="6.4" cy="6.4" r="4.2"/><path d="M9.4 9.4 15.6 15.6"/><path d="M13.4 13.4l1.6-1.6"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body);color:var(--ots-text)">Passkey 登录</span>
+        <span style="background:var(--ots-accent-weak);color:var(--ots-accent);
+          font-size:var(--ots-fs-meta);font-weight:var(--ots-fw-strong);
+          padding:3px 9px;border-radius:var(--ots-r-full)">已启用</span>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+    </div>
+
+    <!-- group 通用 -->
+    <div style="font-size:var(--ots-fs-meta);color:var(--ots-text-faint);
+      padding:var(--ots-sp-4) var(--ots-sp-4) var(--ots-sp-2)">通用</div>
+    <div style="background:var(--ots-surface);border-top:1px solid var(--ots-divider);
+      border-bottom:1px solid var(--ots-divider)">
+
+      <div style="display:flex;align-items:center;gap:var(--ots-sp-3);min-height:48px;
+        padding:var(--ots-sp-3) var(--ots-sp-4);border-bottom:1px solid var(--ots-divider)">
+        <svg width="17" height="18" viewBox="0 0 17 18" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><path d="M8.5 1.4a5 5 0 0 1 5 5c0 4 1.6 5.6 1.6 5.6H1.9s1.6-1.6 1.6-5.6a5 5 0 0 1 5-5Z"/><path d="M6.6 14.6a2 2 0 0 0 3.8 0"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body)">通知推送</span>
+        <span style="width:42px;height:24px;border-radius:var(--ots-r-full);
+          background:var(--ots-accent);position:relative;flex:0 0 auto">
+          <span style="position:absolute;top:3px;right:3px;width:18px;height:18px;
+            border-radius:var(--ots-r-full);background:var(--ots-surface)"></span></span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:var(--ots-sp-3);min-height:48px;
+        padding:var(--ots-sp-3) var(--ots-sp-4);border-bottom:1px solid var(--ots-divider)">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><path d="M8.5 1.4A7.1 7.1 0 1 0 15.6 8.5 5.4 5.4 0 0 1 8.5 1.4Z"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body)">深色模式</span>
+        <span style="width:42px;height:24px;border-radius:var(--ots-r-full);
+          background:var(--ots-divider);position:relative;flex:0 0 auto">
+          <span style="position:absolute;top:3px;left:3px;width:18px;height:18px;
+            border-radius:var(--ots-r-full);background:var(--ots-surface)"></span></span>
+      </div>
+
+      <button style="width:100%;display:flex;align-items:center;gap:var(--ots-sp-3);min-height:48px;
+        padding:var(--ots-sp-3) var(--ots-sp-4);border:0;background:none;
+        border-bottom:1px solid var(--ots-divider);cursor:pointer;text-align:left">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7.1"/><path d="M1.4 8.5h14.2"/><path d="M8.5 1.4c3.4 3.8 3.4 10.4 0 14.2-3.4-3.8-3.4-10.4 0-14.2Z"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body)">语言</span>
+        <span style="font-size:var(--ots-fs-preview);color:var(--ots-text-faint)">简体中文</span>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+
+      <button style="width:100%;display:flex;align-items:center;gap:var(--ots-sp-3);min-height:48px;
+        padding:var(--ots-sp-3) var(--ots-sp-4);border:0;background:none;
+        border-bottom:1px solid var(--ots-divider);cursor:pointer;text-align:left">
+        <svg width="16" height="17" viewBox="0 0 16 17" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><path d="M1.4 4.2h13.2"/><path d="M3 4.2v11a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-11"/><path d="M6 4.2V2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2.2"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body)">清除缓存</span>
+        <span style="font-size:var(--ots-fs-preview);color:var(--ots-text-faint)">86 MB</span>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+
+      <button style="width:100%;display:flex;align-items:center;gap:var(--ots-sp-3);min-height:48px;
+        padding:var(--ots-sp-3) var(--ots-sp-4);border:0;background:none;cursor:pointer;text-align:left">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" stroke="var(--ots-text-sub)" stroke-width="1.7" aria-hidden="true"><circle cx="8.5" cy="8.5" r="7.1"/><path d="M8.5 7.6v4.4"/><circle cx="8.5" cy="5.2" r=".9" fill="currentColor" stroke="none"/></svg>
+        <span style="flex:1;font-size:var(--ots-fs-body)">关于</span>
+        <span style="font-size:var(--ots-fs-preview);color:var(--ots-text-faint)">v0.1.0</span>
+        <svg width="7" height="12" viewBox="0 0 7 12" fill="none" stroke="var(--ots-text-faint)" stroke-width="1.6" aria-hidden="true"><path d="M1 1l5 5-5 5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <button aria-label="邮件"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="1.5" y="4" width="17" height="12.5" rx="2"/><path d="m2.5 5.5 7.5 5.5 7.5-5.5"/></svg>邮件</button>
+    <button aria-label="已发送"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 2 2 8.6l6 2.4 2.4 6L18 2Z"/><path d="M8 11 18 2"/></svg>已发送</button>
+    <button aria-label="星标"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m10 1.6 2.6 5.3 5.8.85-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8L1.6 7.75l5.8-.85L10 1.6Z"/></svg>星标</button>
+    <button class="on" aria-label="我的"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="10" cy="6.6" r="3.6"/><path d="M2.8 18c.9-3.7 3.8-5.6 7.2-5.6s6.3 1.9 7.2 5.6"/></svg>我的</button>
+  </nav>
+</div>
+<div class="cap"><b>④ 我的</b>存储用量条 + 分组设置<br>Passkey 已在上游 dev 有现成实现，可直接接入</div>
+</div>
+
+</div>
+<div style="max-width:1560px;margin:var(--ots-sp-2) auto 0;background:var(--ots-surface);
+  border:1px solid var(--ots-divider);border-radius:var(--ots-r-md);padding:var(--ots-sp-4) var(--ots-sp-5)">
+  <div style="font-size:var(--ots-fs-body);font-weight:var(--ots-fw-strong);margin-bottom:var(--ots-sp-3)">设计说明</div>
+  <ul style="margin:0;padding-left:18px;color:var(--ots-text-sub);font-size:var(--ots-fs-preview);line-height:2">
+    <li><b style="color:var(--ots-text)">验证码优先</b>：自建邮箱最高频用途就是收验证码，所以详情页把验证码做成高亮胶囊 + 一键复制，视觉权重仅次于主题。后端已有 AI 验证码识别（<code>aiCode</code>），前端可直接消费。</li>
+    <li><b style="color:var(--ots-text)">克制用色</b>：强调色只用于「可点击的主动作」与「需要注意的状态」——底栏当前项、FAB、主按钮（复制 / 回复 / 发送）、未读点、验证码胶囊、开关与用量条。其余全部中性灰阶，接近 Gmail / Material 3 的取向，不做渐变与装饰插画。</li>
+    <li><b style="color:var(--ots-text)">列表信息密度</b>：头像首字 + 主题 + 单行预览 + 时间，未读靠「加粗 + 蓝点」双重编码而非只靠颜色（照顾色觉障碍）。星标与附件用小图标挂在时间下方，不挤压主题行。</li>
+    <li><b style="color:var(--ots-text)">底栏四项</b>：邮件 / 已发送 / 星标 / 我的，与现有 Web 端路由一一对应（<code>/inbox</code> <code>/send</code> <code>/star</code> <code>/setting</code>），不新增后端接口即可跑通。</li>
+    <li><b style="color:var(--ots-text)">所有触控目标 ≥ 48×48</b>，图标按钮均带 aria-label；配色全部取自 <code>design/tokens.css</code>，未来接 Kotlin 时直接映射成 <code>colors.xml</code>。</li>
+    <li><b style="color:var(--ots-text)">实现注记</b>：① 列表需预留约 88dp 底部内边距，否则滚到底时末封邮件会被 FAB 永久压住；② 「既未读又加星」的组合态本稿未覆盖，实现时约定为「星标在上、蓝点在下」并排；③ 深色模式的 token 已在 <code>tokens.css</code> 备好但未做视觉验证。</li>
+    <li><b style="color:var(--ots-text)">待你拍板</b>：① 是否要深色模式（本稿只出了浅色）② 底栏第二项放「已发送」还是「草稿」③ 是否需要多账号快速切换（顶部下拉 or 侧边抽屉）。</li>
+  </ul>
+</div>
+
+</body>
+</html>
