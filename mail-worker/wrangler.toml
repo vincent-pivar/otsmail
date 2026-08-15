@@ -28,7 +28,11 @@ id = "8477df59698d4915afb7baaa000d4870"
 
 [[r2_buckets]]
 binding = "r2"			#r2对象存储绑定名默认不可修改
-bucket_name = "otsmail-r2"
+## 直接共用旧 cloud-mail 的桶 mail-r2：
+## - 历史附件、背景图都在里面，公开域名 r2.atproxy.eu.org 已绑定它并就绪
+## - 新邮件附件写进同一个桶，前端按 r2_domain 拼 URL 立即可读
+## 迁移观察期后若要独立，再把对象整体迁到 otsmail-r2 并改这里 + 换绑公开域名。
+bucket_name = "mail-r2"
 
 #[[send_email]]
 #name = "email"			#CF发件, 配置后优先使用
