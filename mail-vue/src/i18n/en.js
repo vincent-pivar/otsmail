@@ -338,7 +338,12 @@ const en = {
     searchUser: 'Search by user',
     searchEmail: 'Search by Email',
     searchSender: 'Search by Sender',
-    userEmail: 'Email Address'
+    userEmail: 'Email Address',
+    translate: 'Translate',
+    showOriginal: 'Show original',
+    translatedFrom: 'Translated from {lang}',
+    langUnknown: 'unknown',
+    alreadyInTargetLang: 'This email is already in the target language'
 }
 
 export default en

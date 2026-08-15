@@ -9,12 +9,30 @@
       </span>
       <Icon class="icon" v-if="emailStore.contentData.showReply" v-perm="'email:send'"  @click="openReply" icon="la:reply" width="21" height="21" />
       <Icon class="icon" v-if="emailStore.contentData.showReply" v-perm="'email:send'"  @click="openForward" icon="iconoir:arrow-up-right" width="20" height="20" />
+      <el-tooltip
+          :content="translationState === 'translated' ? $t('showOriginal') : $t('translate')"
+          placement="top">
+        <el-dropdown trigger="click" @command="onTranslateCmd" :teleported="false">
+          <Icon
+              class="icon"
+              :class="{ 'translating': translationState === 'loading' }"
+              :icon="translationState === 'translated' ? 'mdi:translate-off' : 'mdi:translate'"
+              width="20" height="20"/>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item v-for="l in targetLangs" :key="l.code" :command="l.code">
+                {{ l.name }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </el-tooltip>
     </div>
     <div></div>
     <el-scrollbar class="scrollbar">
       <div class="container">
         <div class="email-title">
-          {{ email.subject }}
+          {{ displaySubject }}
         </div>
         <div class="content">
           <div class="email-info">
@@ -34,8 +52,17 @@
             <el-alert v-if="email.status === 4" :closable="false" :title="$t('complained')" class="email-msg" type="warning" show-icon />
             <el-alert v-if="email.status === 5" :closable="false" :title="$t('delayed')" class="email-msg" type="warning" show-icon />
           </div>
+          <el-alert
+              v-if="translationState === 'translated'"
+              type="info"
+              :closable="false"
+              class="translation-banner"
+              show-icon>
+            <span>{{ $t('translatedFrom', { lang: sourceLang || $t('langUnknown') }) }}</span>
+            <el-link type="primary" @click="toggleOriginal">&nbsp;{{ $t('showOriginal') }}</el-link>
+          </el-alert>
           <el-scrollbar class="htm-scrollbar" :class="email.attList.length === 0 ? 'bottom-distance' : ''">
-            <ShadowHtml class="shadow-html" :html="formatImage(email.content)" v-if="email.content" />
+            <ShadowHtml class="shadow-html" :html="formatImage(displayContent)" v-if="displayContent" />
             <pre v-else class="email-text" >{{email.text}}</pre>
           </el-scrollbar>
           <div class="att" v-if="email.attList.length > 0">
@@ -92,6 +119,8 @@ import {allEmailDelete} from "@/request/all-email.js";
 import {useUiStore} from "@/store/ui.js";
 import {useI18n} from "vue-i18n";
 import {EmailUnreadEnum} from "@/enums/email-enum.js";
+import {translateEmail} from "@/request/translation.js";
+import {computed} from "vue";
 
 const uiStore = useUiStore();
 const settingStore = useSettingStore();
@@ -102,7 +131,75 @@ const email = emailStore.contentData.email
 const showPreview = ref(false)
 const srcList = reactive([])
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+// ---- 一键翻译 ----------------------------------------------------------
+const targetLangs = [
+  { code: 'zh', name: '简体中文' },
+  { code: 'en', name: 'English' },
+  { code: 'ja', name: '日本語' },
+  { code: 'ko', name: '한국어' },
+  { code: 'fr', name: 'Français' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'es', name: 'Español' },
+  { code: 'ru', name: 'Русский' },
+  { code: 'pt', name: 'Português' },
+  { code: 'it', name: 'Italiano' },
+]
+const translationState = ref('idle') // 'idle' | 'loading' | 'translated'
+const translatedSubject = ref('')
+const translatedContent = ref('')
+const sourceLang = ref('')
+const lastLang = ref('')
+
+const displaySubject = computed(() =>
+  translationState.value === 'translated' ? translatedSubject.value : email.subject)
+const displayContent = computed(() =>
+  translationState.value === 'translated' ? translatedContent.value : email.content)
+
+function toggleOriginal() {
+  translationState.value = 'idle'
+}
+
+// 从下拉选具体语言
+function onTranslateCmd(lang) {
+  doTranslate(lang)
+}
+
+async function doTranslate(lang) {
+  if (translationState.value === 'loading') return
+  // 同一封、同一语言已翻过 → 直接展示缓存
+  if (translatedContent.value && lastLang.value === lang) {
+    translationState.value = 'translated'
+    return
+  }
+  translationState.value = 'loading'
+  try {
+    const data = await translateEmail(email.emailId, lang)
+    if (data.alreadyInTargetLang) {
+      ElMessage({ message: t('alreadyInTargetLang'), type: 'info', plain: true })
+      translationState.value = 'idle'
+      return
+    }
+    translatedSubject.value = data.translatedSubject
+    translatedContent.value = data.translatedContent
+    sourceLang.value = data.sourceLang || ''
+    lastLang.value = lang
+    translationState.value = 'translated'
+  } catch (e) {
+    translationState.value = 'idle'
+  }
+}
+
+// 切换邮件时清空翻译态
+watch(() => email.emailId, () => {
+  translationState.value = 'idle'
+  translatedSubject.value = ''
+  translatedContent.value = ''
+  sourceLang.value = ''
+  lastLang.value = ''
+})
+
 watch(() => accountStore.currentAccountId, () => {
   handleBack()
 })

@@ -338,6 +338,11 @@ const zh = {
     searchUser: '搜索用户',
     searchEmail: '搜索邮箱',
     searchSender: '搜索发件人',
-    userEmail: '用户邮箱'
+    userEmail: '用户邮箱',
+    translate: '翻译',
+    showOriginal: '显示原文',
+    translatedFrom: '已由 {lang} 翻译',
+    langUnknown: '未知语言',
+    alreadyInTargetLang: '该邮件已是目标语言'
 }
 export default zh
