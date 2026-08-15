@@ -1,0 +1,45 @@
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist-ssr
+*.local
+dist
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+mail-vue/node_modules
+mail-vue/dist
+mail-worker/node_modules
+mail-worker/dist
+mail-worker/.dryrun
+mail-worker/tmp
+.wrangler
+.venv
+
+# --- otsmail 追加 ---------------------------------------------------
+# 本地机密：绝对不要提交
+.dev.vars
+.env
+.env.local
+.otsmail-deploy.env
+
+# 临时验证脚本 / 数据导出（迁移时产生的 D1 dump 可能含用户邮件内容）
+_*.mjs
+_*.sql
+_*.png
+*-d1.sql
+*-data.sql

@@ -1,0 +1,52 @@
+## otsmail 测试环境配置
+##
+## 上游此文件带作者自己的 D1/KV ID 和写死的 jwt_secret，已清空成模板。
+## 需要独立测试环境时填自己的资源 ID：
+##   npx wrangler d1 create otsmail-test
+##   npx wrangler kv namespace create otsmail-test-kv
+
+name = "otsmail-test"
+main = "src/index.js"
+compatibility_date = "2025-06-04"
+keep_vars = true
+
+[observability]
+enabled = true
+
+[[d1_databases]]
+binding = "db"			#d1数据库绑定名默认不可修改
+database_name = "otsmail-test"		#d1数据库名字
+database_id = ""		#d1数据库id
+
+[[kv_namespaces]]
+binding = "kv"			#kv绑定名默认不可修改
+id = ""					#kv数据库id
+
+#(可选)
+#[[r2_buckets]]
+#binding = "r2"			#r2对象存储绑定名默认不可修改
+#bucket_name = "otsmail-test-r2"		#r2对象存储桶的名字
+
+[ai]
+binding = "ai"
+
+[assets]
+binding = "assets"		#静态资源绑定名默认不可修改
+directory = "./dist"	#前端vue项目打包的静态资源存放位置,默认dist
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[triggers]
+crons = ["0 16 * * *"]	#每天晚上12点执行每日任务,刷新分析缓存
+
+
+[vars]
+ai_model = ""			#ai模型,不填默认使用@cf/meta/llama-3.1-8b-instruct-fast
+analysis_cache = false			#是否开启分析数据缓存
+orm_log = false			#是否sql日志
+domain = ["example.com"]				#邮件域名可可配置多个
+admin = "admin@example.com"				#管理员的邮箱
+jwt_secret = "test-only-change-me"			#测试环境专用，勿复用到生产
+
+[build]
+command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"

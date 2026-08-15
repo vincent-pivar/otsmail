@@ -1,0 +1,83 @@
+/* otsmail Android client — design tokens (CONTRACT FILE)
+ * Every mockup MUST use only these variables. No raw hex, no other palette.
+ * Owner: project lead. Do not add or rename tokens without approval.
+ */
+
+:root {
+  /* ---- Brand / accent ---------------------------------------------- */
+  --ots-accent:        #0E70DF;   /* primary action, links (matches web UI) */
+  --ots-accent-press:  #0A57AE;
+  --ots-accent-weak:   #E7F1FD;   /* accent tint background */
+
+  /* ---- Neutrals (surfaces & text) --------------------------------- */
+  --ots-bg:            #F5F6FA;   /* app background */
+  --ots-surface:       #FFFFFF;   /* cards, list rows, sheets */
+  --ots-surface-alt:   #FAFBFC;   /* subtle alternating / pressed */
+  --ots-divider:       #ECEEF2;
+
+  --ots-text:          #13181D;   /* primary text */
+  --ots-text-sub:      #5B6572;   /* secondary text, preview line */
+  --ots-text-faint:    #98A1AD;   /* timestamps, meta */
+  --ots-text-on-accent:#FFFFFF;
+
+  /* ---- Semantic --------------------------------------------------- */
+  --ots-unread:        #0E70DF;   /* unread dot */
+  --ots-star:          #F5A623;   /* starred */
+  --ots-danger:        #E5484D;   /* delete, bounced */
+  --ots-success:       #2DA44E;   /* delivered */
+  --ots-warn:          #D98A00;   /* deferred */
+
+  /* ---- Avatar seeds (sender initials) — use ONLY these ------------- */
+  --ots-av-1:          #5B8DEF;
+  --ots-av-2:          #6E56CF;
+  --ots-av-3:          #1F9C8F;
+  --ots-av-4:          #D9773A;
+  --ots-av-5:          #C2557C;
+
+  /* ---- Type scale (Android sp -> px 1:1 at dpr1) ------------------ */
+  --ots-fs-title:      20px;  /* app bar title */
+  --ots-fs-subject:    15px;  /* list subject */
+  --ots-fs-body:       14px;  /* body text */
+  --ots-fs-preview:    13px;  /* list preview line */
+  --ots-fs-meta:       12px;  /* timestamp, labels */
+  --ots-fw-strong:     600;
+  --ots-fw-normal:     400;
+
+  /* ---- Spacing (8pt grid) ----------------------------------------- */
+  --ots-sp-1:          4px;
+  --ots-sp-2:          8px;
+  --ots-sp-3:          12px;
+  --ots-sp-4:          16px;
+  --ots-sp-5:          24px;
+  --ots-sp-6:          32px;
+
+  /* ---- Radius / elevation ----------------------------------------- */
+  --ots-r-sm:          8px;
+  --ots-r-md:          12px;
+  --ots-r-lg:          16px;
+  --ots-r-full:        999px;
+  --ots-shadow-1:      0 1px 2px rgba(19, 24, 29, .06);
+  --ots-shadow-2:      0 4px 16px rgba(19, 24, 29, .10);
+
+  /* ---- Android chrome metrics (for the phone frame) ---------------- */
+  --ots-statusbar-h:   28px;
+  --ots-appbar-h:      56px;
+  --ots-navbar-h:      56px;   /* bottom nav */
+  --ots-fab:           56px;
+}
+
+/* Dark theme — applied via [data-theme="dark"] on the phone frame. */
+[data-theme="dark"] {
+  --ots-bg:            #0F1216;
+  --ots-surface:       #171B21;
+  --ots-surface-alt:   #1D222A;
+  --ots-divider:       #262C35;
+
+  --ots-text:          #E8EBEF;
+  --ots-text-sub:      #A3ADBA;
+  --ots-text-faint:    #6C7684;
+  --ots-accent-weak:   #16293F;
+}
+
+/* NOTE: dark mode is NOT yet visually reviewed. Light mode is the
+ * approval target for the first design round. */

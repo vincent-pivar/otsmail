@@ -1,0 +1,67 @@
+## otsmail — 独立维护版 Worker 配置
+##
+## ⚠️ Worker 名故意与上游 cloud-mail 不同。旧的 cloud-mail Worker（含其 D1/KV/R2
+##    和自定义域名路由）不受本项目部署影响，可以继续跑。确认过 `name` 不与账号里
+##    现有 Worker 冲突后再 deploy。
+##
+## ⚠️ jwt_secret 不要写在 [vars] 里（会进 git、Dashboard 明文可见）。
+##    改用 Worker Secret：
+##        npx wrangler secret put jwt_secret
+##    代码读的还是 env.jwt_secret，无需改动。
+
+name = "otsmail"
+main = "src/index.js"
+compatibility_date = "2025-06-04"
+keep_vars = true
+
+[observability]
+enabled = true
+
+#[[d1_databases]]
+#binding = "db"			#d1数据库绑定名默认不可修改
+#database_name = ""		#d1数据库名字（建议 otsmail）
+#database_id = ""		#d1数据库id
+
+#[[kv_namespaces]]
+#binding = "kv"			#kv绑定名默认不可修改
+#id = ""					#kv数据库id
+
+#[[r2_buckets]]
+#binding = "r2"			#r2对象存储绑定名默认不可修改
+#bucket_name = ""		#r2对象存储桶的名字（建议 otsmail-r2）
+
+#[[send_email]]
+#name = "email"			#CF发件, 配置后优先使用
+
+[ai]
+binding = "ai"
+
+[assets]
+binding = "assets"		#静态资源绑定名默认不可修改
+directory = "./dist"	#前端vue项目打包的静态资源存放位置,默认dist
+not_found_handling = "single-page-application"
+run_worker_first = true
+
+[triggers]
+crons = ["0 16 * * *"]	#每天晚上12点执行每日任务,刷新分析缓存
+
+
+[vars]
+#ai_model = ""			#ai模型,不填默认使用@cf/meta/llama-3.1-8b-instruct-fast
+#analysis_cache = false			#是否开启分析数据缓存
+#orm_log = false			#是否sql日志
+#domain = []				#邮件域名可可配置多个 示例: ["example1.com","example2.com"]
+#admin = ""				#管理员的邮箱	示例: admin@example.com
+## jwt_secret 见文件头：用 `wrangler secret put jwt_secret`，不要写在这里。
+## allow_origin 可选：跨域白名单，逗号分隔。不设时只允许同源（推荐留空）。
+##   示例: allow_origin = "https://mail.example.com"
+#allow_origin = ""
+## pwd_iterations 可选：口令哈希（PBKDF2-SHA256）轮数。
+##   不设 = 210000（OWASP 推荐），单次约 120ms CPU —— 需要 Workers 付费档。
+##   ⚠️ Workers 免费档限 10ms CPU/请求，必须下调，否则登录/注册会 1102 超时：
+##   免费档建议 pwd_iterations = 8000（约 5ms，仍远强于上游的单轮 SHA-256）。
+##   轮数写在哈希里，随时改配置不会让老用户登不上。
+#pwd_iterations = 8000
+
+[build]
+command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
