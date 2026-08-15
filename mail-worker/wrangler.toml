@@ -17,18 +17,18 @@ keep_vars = true
 [observability]
 enabled = true
 
-#[[d1_databases]]
-#binding = "db"			#d1数据库绑定名默认不可修改
-#database_name = ""		#d1数据库名字（建议 otsmail）
-#database_id = ""		#d1数据库id
+[[d1_databases]]
+binding = "db"			#d1数据库绑定名默认不可修改
+database_name = "otsmail"
+database_id = "4db24bf3-789c-4760-aa34-3e4bad705967"
 
-#[[kv_namespaces]]
-#binding = "kv"			#kv绑定名默认不可修改
-#id = ""					#kv数据库id
+[[kv_namespaces]]
+binding = "kv"			#kv绑定名默认不可修改
+id = "8477df59698d4915afb7baaa000d4870"
 
-#[[r2_buckets]]
-#binding = "r2"			#r2对象存储绑定名默认不可修改
-#bucket_name = ""		#r2对象存储桶的名字（建议 otsmail-r2）
+[[r2_buckets]]
+binding = "r2"			#r2对象存储绑定名默认不可修改
+bucket_name = "otsmail-r2"
 
 #[[send_email]]
 #name = "email"			#CF发件, 配置后优先使用
@@ -42,11 +42,18 @@ directory = "./dist"	#前端vue项目打包的静态资源存放位置,默认dis
 not_found_handling = "single-page-application"
 run_worker_first = true
 
-[triggers]
-crons = ["0 16 * * *"]	#每天晚上12点执行每日任务,刷新分析缓存
+## [triggers] cron 每日刷分析缓存 —— 免费档「每账号 5 个 cron」已满，暂不启用。
+## 需要的话改用本机 Hermes cron 定时打 /api 端点（不占 CF 配额）。
+#[triggers]
+#crons = ["0 16 * * *"]	#每天晚上12点执行每日任务,刷新分析缓存
 
 
 [vars]
+## Workers 免费档：口令哈希轮数下调到 8000（约 5ms），否则登录/注册会 1102 CPU 超时。
+## 仍远强于上游单轮 SHA-256；轮数写在哈希里，将来升付费档改回 210000 不影响老用户。
+pwd_iterations = 8000
+domain = ["atproxy.eu.org", "otscup.com"]	#邮件域名，@ 后面部分，可多个
+admin = "admin@atproxy.eu.org"				#管理员邮箱
 #ai_model = ""			#ai模型,不填默认使用@cf/meta/llama-3.1-8b-instruct-fast
 #analysis_cache = false			#是否开启分析数据缓存
 #orm_log = false			#是否sql日志
