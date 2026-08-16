@@ -31,8 +31,18 @@ const dbInit = {
 		await this.v3_0DB(c);
 		await this.v3_1DB(c);
 		await this.otsmail_1DB(c);
+		await this.otsmail_2DB(c);
 		await settingService.refresh(c);
 		return c.text('success');
+	},
+
+	// otsmail 迁移：管理员可配的 DeepL API key（存 setting，前端设置页可填）
+	async otsmail_2DB(c) {
+		try {
+			await c.env.db.prepare(`ALTER TABLE setting ADD COLUMN deepl_key TEXT NOT NULL DEFAULT '';`).run();
+		} catch (e) {
+			console.warn(`跳过字段：${e.message}`);
+		}
 	},
 
 	// otsmail 迁移：邮件翻译缓存表

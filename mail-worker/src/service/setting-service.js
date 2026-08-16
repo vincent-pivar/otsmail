@@ -101,6 +101,8 @@ const settingService = {
 		settingRow.s3AccessKey = settingRow.s3AccessKey ? `${settingRow.s3AccessKey.slice(0, 12)}******` : null;
 		settingRow.s3SecretKey = settingRow.s3SecretKey ? `${settingRow.s3SecretKey.slice(0, 12)}******` : null;
 		settingRow.tgBotToken = settingRow.tgBotToken ? `${settingRow.tgBotToken.slice(0, 20)}******` : null;
+		// DeepL key 脱敏：仅回显前 8 位，避免设置页明文泄露
+		settingRow.deeplKey = settingRow.deeplKey ? `${settingRow.deeplKey.slice(0, 8)}******` : '';
 		settingRow.hasR2 = !!c.env.r2
 		settingRow.hasCfEmail = !!c.env.email
 
@@ -138,6 +140,11 @@ const settingService = {
 		if (Array.isArray(params.aiCodeFilter)) {
 			params.aiCodeFilter = params.aiCodeFilter + '';
 		}
+
+		// 脱敏字段：前端回传含 ****** 的占位值说明未修改，剔除以免覆盖真实 key
+		['deeplKey', 'secretKey', 'tgBotToken', 's3AccessKey', 's3SecretKey'].forEach(k => {
+			if (typeof params[k] === 'string' && params[k].includes('******')) delete params[k];
+		});
 
 		params.resendTokens = JSON.stringify(resendTokens);
 		await orm(c).update(setting).set({ ...params }).returning().get();

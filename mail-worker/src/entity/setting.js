@@ -52,6 +52,7 @@ export const setting = sqliteTable('setting', {
 	blackFrom: text('black_from').default('').notNull(),
 	aiCode: integer('ai_code').default(1).notNull(),
 	aiCodeFilter: text('ai_code_filter').default('').notNull(),
-	syncDelete: integer('sync_delete').default(1).notNull()
+	syncDelete: integer('sync_delete').default(1).notNull(),
+	deeplKey: text('deepl_key').default('').notNull()
 });
 export default setting
