@@ -74,5 +74,8 @@ admin = "admin@atproxy.eu.org"				#管理员邮箱
 ##   轮数写在哈希里，随时改配置不会让老用户登不上。
 #pwd_iterations = 8000
 
-[build]
-command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
+## [build] 本机 8.5GB 内存跑 pnpm build 会 OOM（exit 3221226505）。
+## dist 已由独立的 `pnpm --prefix ../mail-vue run build` 预先构建好，deploy 直接上传。
+## 需要重建前端时单独跑上面那条命令，别让 wrangler 的 build hook 触发。
+#[build]
+#command = "pnpm --prefix ../mail-vue install && pnpm --prefix ../mail-vue run build"
